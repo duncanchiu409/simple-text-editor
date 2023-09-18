@@ -1,13 +1,20 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<termios.h>
+#include<stdlib.h>
+
+struct termios original;
+
+void disable_raw_mode(){
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
+}
 
 void enable_raw_mode(){
-  struct termios raw;
-
-  tcgetattr(STDIN_FILENO, &raw);
-
-  raw.c_cflag &= ~(ECHO); // bitwise AND operation on raw.c_cflag and ~(ECHO) and put inside raw.c_cflag
+  tcgetattr(STDIN_FILENO, &original);
+  atexit(disable_raw_mode);
+  
+  struct termios raw = original;
+  raw.c_cflag &= ~(ECHO | ICANON); // bitwise AND operation on raw.c_cflag and ~(ECHO) and put inside raw.c_cflag
   
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }

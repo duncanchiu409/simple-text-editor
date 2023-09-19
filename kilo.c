@@ -15,8 +15,9 @@ void enable_raw_mode(){
   atexit(disable_raw_mode); // register our function disable_raw_mode to be called automatically when program exits
     
   struct termios raw = original;
-  raw.c_iflag &= ~(ICRNL | IXON);
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
   raw.c_oflag &= ~(OPOST);
+  raw.c_cflag |= ~(CS8);
   raw.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN); // bitwise AND operation on raw.c_cflag and ~(ECHO) and put inside raw.c_cflag
   
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);

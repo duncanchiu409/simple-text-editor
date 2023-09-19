@@ -3,15 +3,25 @@
 #include<termios.h>
 #include<stdlib.h>
 #include<ctype.h>
+#include<errno.h>
 
 struct termios original;
 
+void die(const char* s){
+  perror(s);
+  exit(1);
+}
+
 void disable_raw_mode(){
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &original);
+  if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &original) == -1){
+    die("tcsetattr");
+  }
 }
 
 void enable_raw_mode(){
-  tcgetattr(STDIN_FILENO, &original);
+  if(tcgetattr(STDIN_FILENO, &original) == -1){
+    die("tcgetattr");
+  }
   atexit(disable_raw_mode); // register our function disable_raw_mode to be called automatically when program exits
     
   struct termios raw = original;
@@ -23,7 +33,9 @@ void enable_raw_mode(){
   raw.c_cc[VMIN] = 0;
   raw.c_cc[VTIME] = 1;
   
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+  if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1){
+    die("tcsetattr");
+  }
 }
 
 int main(int argc, char* argv[]){
@@ -33,7 +45,9 @@ int main(int argc, char* argv[]){
 
   while(1){
     char c = '\0';
-    read(STDIN_FILENO, &c, 1);
+    if(read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN){
+      die("read");
+    }
     if(iscntrl(c)){
       printf("%d\r\n", c);
     }

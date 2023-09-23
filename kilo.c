@@ -1,3 +1,5 @@
+// includes 
+
 #include<stdio.h>
 #include<unistd.h>
 #include<termios.h>
@@ -5,7 +7,11 @@
 #include<ctype.h>
 #include<errno.h>
 
+// data
+
 struct termios original;
+
+// terminal
 
 void die(const char* s){
   perror(s);
@@ -37,6 +43,8 @@ void enable_raw_mode(){
     die("tcsetattr");
   }
 }
+
+// init
 
 int main(int argc, char* argv[]){
   enable_raw_mode();

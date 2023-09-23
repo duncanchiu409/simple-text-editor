@@ -7,6 +7,10 @@
 #include<ctype.h>
 #include<errno.h>
 
+// defines
+
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 // data
 
 struct termios original;
@@ -62,7 +66,7 @@ int main(int argc, char* argv[]){
     else{
       printf("%d ( '%c' )\r\n", c, c);
     }
-    if(c == 'q'){
+    if(c == CTRL_KEY('q')){
       break;
     }
   }
